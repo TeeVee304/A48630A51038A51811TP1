@@ -1,19 +1,41 @@
 import numpy as np
 import matplotlib.pyplot as plt
+
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix
 
-def get_best_params(param_grid,model,data,labels):
-    
+def get_best_params(param_grid, model, data, labels):
+    """
+    Obtém os melhores parâmetros para um dado modelo e conjunto de dados recorrendo ao GridSearchCV.
+    Parâmetros
+        param_grid : dict
+            Dicionário com os nomes dos parâmetros (strings) como chaves e listas de valores a testar.
+        model : Any
+            Modelo a utilizar no GridSearchCV.
+        data : numpy array
+            Dados de entrada a utilizar no GridSearchCV.
+        labels : numpy array
+            Etiquetas correspondentes aos dados de entrada.
+    Retorna
+        dict : Dicionário com os melhores parâmetros encontrados pelo GridSearchCV.
+    """
     grid_search = GridSearchCV(estimator=model, param_grid=param_grid)
     grid_search.fit(data, labels)
     
     return grid_search.best_params_
 
 def predition_stats(trueclass,prediction):
+    """
+    Calcula estatísticas de desempenho para um modelo de classificação.
+    Parâmetros
+        trueclass : numpy array
+            Array com as classes verdadeiras.
+        prediction : numpy array
+            Array com as classes previstas.
+    """
     cm = confusion_matrix(trueclass,prediction)
     
     true_pos = cm[0][0]
@@ -50,6 +72,22 @@ def predition_stats(trueclass,prediction):
     
 
 def linearRegr(x,y,show_coef=False,show_regr_tax=False,plot_reta= False, plot_erros=False):
+    """
+    Função para fazer uma regressão linear com sklearn.
+    Parâmetros
+        x : numpy array
+            Dados de entrada.
+        y : numpy array
+            Valores a prever.
+        show_coef : bool     (False)
+            Mostra os coeficientes da regressão.
+        show_regr_tax : bool (False)
+            Mostra o R2 da regressão.
+        plot_reta : bool     (False)
+            Plota a reta de regressão.
+        plot_erros : bool    (False)
+            Plota os erros da regressão.
+    """
     x = np.array([x])
     y = np.array([y])
     
@@ -60,12 +98,14 @@ def linearRegr(x,y,show_coef=False,show_regr_tax=False,plot_reta= False, plot_er
     R2 = linReg.score(x.T,y.T)
     
     if show_coef:
-        print(f'Coeficientes da regressão : {w0[0]}, {w}')
-        
+        print(f'Coeficientes da regressão : {w0[0]}, {w}') 
     if show_regr_tax:
         print(f'R2 : {np.round(R2*100,2)}%')
         
 def polinomialRegr(x,y,show_coef=False,show_regr_tax=False,plot_reta= False, plot_erros=False):
+    """
+    Função para fazer uma regressão polinomial de grau 3 com sklearn.
+    """
     x = np.array([x])
     y = np.array([y])
     
@@ -114,5 +154,13 @@ def polinomialRegr(x,y,show_coef=False,show_regr_tax=False,plot_reta= False, plo
         print(f'R2 = {np.round(R2*100,2)}%')
         
 def normalize_data(data):
+    """
+    Normaliza os dados de entrada para terem média 0 e variância 1.
+    Parameters
+        data : numpy array
+            Dados de entrada a serem normalizados.
+    Returns
+        numpy array : Dados de entrada normalizados.
+    """
     ss = StandardScaler().fit(data)
     return ss.transform(data)
