@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
-import sklearn.preprocessing as pp
+from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix
 
@@ -114,5 +114,5 @@ def polinomialRegr(x,y,show_coef=False,show_regr_tax=False,plot_reta= False, plo
         print(f'R2 = {np.round(R2*100,2)}%')
         
 def normalize_data(data):
-    ss = pp.StandardScaler().fit(data)
+    ss = StandardScaler().fit(data)
     return ss.transform(data)
