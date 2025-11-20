@@ -5,7 +5,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, roc_curve, roc_auc_score
 
 def get_best_params(param_grid, model, data, labels):
     """
@@ -164,3 +164,12 @@ def normalize_data(data):
     """
     ss = StandardScaler().fit(data)
     return ss.transform(data)
+
+def ROC_curve(trainingTarget,decision_fun):
+    fpr, tpr, limiar = roc_curve(trainingTarget, decision_fun)
+    auc_clf = roc_auc_score(trainingTarget, decision_fun)
+    plt.plot(fpr, tpr)
+    plt.title("ROC Curve")
+    plt.ylabel("True Positive Rate")
+    plt.xlabel("False Positive Rate")
+    print(f"Score: {np.round(auc_clf,4)*100}%")
