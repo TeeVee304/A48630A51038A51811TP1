@@ -153,7 +153,7 @@ def polinomialRegr(x,y,show_coef=False,show_regr_tax=False,plot_reta= False, plo
     if show_regr_tax:
         print(f'R2 = {np.round(R2*100,2)}%')
         
-def normalize(data):
+def normalize_data(data):
     """
     Normaliza os dados de entrada para terem média 0 e variância 1.
     Parameters
