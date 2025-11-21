@@ -172,4 +172,4 @@ def ROC_curve(trainingTarget,decision_fun):
     plt.title("ROC Curve")
     plt.ylabel("True Positive Rate")
     plt.xlabel("False Positive Rate")
-    print(f"ROC Score: {np.round(auc_clf,4)*100}%")
+    print(f"ROC Score: {np.round(auc_clf*100,4)}%")
