@@ -7,6 +7,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix, roc_curve, roc_auc_score
 
+from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import accuracy_score, roc_auc_score
+
 def get_best_params(param_grid, model, data, labels):
     """
     Obtém os melhores parâmetros para um dado modelo e conjunto de dados recorrendo ao GridSearchCV.
@@ -165,7 +168,7 @@ def normalize_data(data):
     ss = StandardScaler().fit(data)
     return ss.transform(data)
 
-def ROC_curve(trainingTarget,decision_fun):
+def ROC_curve(trainingTarget, decision_fun):
     fpr, tpr, limiar = roc_curve(trainingTarget, decision_fun)
     auc_clf = roc_auc_score(trainingTarget, decision_fun)
     plt.plot(fpr, tpr)
@@ -174,50 +177,44 @@ def ROC_curve(trainingTarget,decision_fun):
     plt.xlabel("False Positive Rate")
     print(f"ROC Score: {np.round(auc_clf*100,4)}%")
 
-def ROC_compare(trainingTarget1, decision_fun1, label1, trainingTarget2, decision_fun2, label2):
+def kfold_cross_validation(model, X, y, k=5):
     """
-    Plota duas curvas ROC lado-a-lado para comparação.
+    Função para avaliar um modelo com validação cruzada estratificada.
+    Parâmetros
+        model : sklearn model
+            Modelo a ser avaliado.
+        X : numpy array
+            Dados de entrada.
+        y : numpy array
+            Valores a prever.
+        k : int (5)
+            Número de folds para a validação cruzada.
+    Returns
+        accuracy_scores : list
+            Lista com as precisões de cada fold.
+        auc_scores : list
+            Lista com os AUC de cada fold.
+    """
+    skf = StratifiedKFold(n_splits=k, shuffle=True, random_state=42)
 
-    Parâmetros:
-        trainingTarget1 : array
-            Targets do primeiro modelo.
-        decision_fun1 : array
-            Função de decisão ou probabilidades do primeiro modelo.
-        label1 : str
-            Título do primeiro modelo.
-        trainingTarget2 : array
-            Targets do segundo modelo.
-        decision_fun2 : array
-            Função de decisão ou probabilidades  do segundo modelo.
-        label2 : str
-            Título do segundo modelo.
-    """
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    accuracy_scores = []
+    auc_scores = []
     
-    # First ROC curve
-    fpr1, tpr1, limiar1 = roc_curve(trainingTarget1, decision_fun1)
-    auc1 = roc_auc_score(trainingTarget1, decision_fun1)
-    ax1.plot(fpr1, tpr1)
-    ax1.plot([0, 1], [0, 1], 'k--')  # Diagonal line
-    ax1.set_title(f"ROC Curve - {label1}")
-    ax1.set_ylabel("True Positive Rate")
-    ax1.set_xlabel("False Positive Rate")
-    ax1.grid(True)
-    ax1.text(0.6, 0.2, f'AUC = {auc1:.4f}', transform=ax1.transAxes)
+    for train_idx, val_idx in skf.split(X, y):
+        # Dividir dados
+        X_train_fold, X_valid_fold = X[train_idx], X[val_idx]
+        y_train_fold, y_valid_fold = y[train_idx], y[val_idx]
+        
+        # Treinar e prever
+        model.fit(X_train_fold, y_train_fold)
+        y_pred = model.predict(X_valid_fold)
+        y_prob = model.predict_proba(X_valid_fold)[:, 1]
+        
+        # Calcular métricas
+        accuracy_scores.append(accuracy_score(y_valid_fold, y_pred))
+        auc_scores.append(roc_auc_score(y_valid_fold, y_prob))
     
-    # Second ROC curve  
-    fpr2, tpr2, limiar2 = roc_curve(trainingTarget2, decision_fun2)
-    auc2 = roc_auc_score(trainingTarget2, decision_fun2)
-    ax2.plot(fpr2, tpr2)
-    ax2.plot([0, 1], [0, 1], 'k--')  # Diagonal line
-    ax2.set_title(f"ROC Curve - {label2}")
-    ax2.set_ylabel("True Positive Rate")
-    ax2.set_xlabel("False Positive Rate")
-    ax2.grid(True)
-    ax2.text(0.6, 0.2, f'AUC = {auc2:.4f}', transform=ax2.transAxes)
+    print(f"Acurácia média: {np.mean(accuracy_scores):.4f} (+/- {np.std(accuracy_scores):.4f})")
+    print(f"AUC médio: {np.mean(auc_scores):.4f} (+/- {np.std(auc_scores):.4f})")
     
-    plt.tight_layout()
-    plt.show()
-    
-    print(f"ROC Score {label1}: {np.round(auc1*100, 4)}%")
-    print(f"ROC Score {label2}: {np.round(auc2*100, 4)}%")
+    return accuracy_scores, auc_scores
