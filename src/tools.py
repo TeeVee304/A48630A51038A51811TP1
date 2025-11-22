@@ -173,3 +173,51 @@ def ROC_curve(trainingTarget,decision_fun):
     plt.ylabel("True Positive Rate")
     plt.xlabel("False Positive Rate")
     print(f"ROC Score: {np.round(auc_clf*100,4)}%")
+
+def ROC_compare(trainingTarget1, decision_fun1, label1, trainingTarget2, decision_fun2, label2):
+    """
+    Plota duas curvas ROC lado-a-lado para comparação.
+
+    Parâmetros:
+        trainingTarget1 : array
+            Targets do primeiro modelo.
+        decision_fun1 : array
+            Função de decisão ou probabilidades do primeiro modelo.
+        label1 : str
+            Título do primeiro modelo.
+        trainingTarget2 : array
+            Targets do segundo modelo.
+        decision_fun2 : array
+            Função de decisão ou probabilidades  do segundo modelo.
+        label2 : str
+            Título do segundo modelo.
+    """
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    
+    # First ROC curve
+    fpr1, tpr1, limiar1 = roc_curve(trainingTarget1, decision_fun1)
+    auc1 = roc_auc_score(trainingTarget1, decision_fun1)
+    ax1.plot(fpr1, tpr1)
+    ax1.plot([0, 1], [0, 1], 'k--')  # Diagonal line
+    ax1.set_title(f"ROC Curve - {label1}")
+    ax1.set_ylabel("True Positive Rate")
+    ax1.set_xlabel("False Positive Rate")
+    ax1.grid(True)
+    ax1.text(0.6, 0.2, f'AUC = {auc1:.4f}', transform=ax1.transAxes)
+    
+    # Second ROC curve  
+    fpr2, tpr2, limiar2 = roc_curve(trainingTarget2, decision_fun2)
+    auc2 = roc_auc_score(trainingTarget2, decision_fun2)
+    ax2.plot(fpr2, tpr2)
+    ax2.plot([0, 1], [0, 1], 'k--')  # Diagonal line
+    ax2.set_title(f"ROC Curve - {label2}")
+    ax2.set_ylabel("True Positive Rate")
+    ax2.set_xlabel("False Positive Rate")
+    ax2.grid(True)
+    ax2.text(0.6, 0.2, f'AUC = {auc2:.4f}', transform=ax2.transAxes)
+    
+    plt.tight_layout()
+    plt.show()
+    
+    print(f"ROC Score {label1}: {np.round(auc1*100, 4)}%")
+    print(f"ROC Score {label2}: {np.round(auc2*100, 4)}%")
