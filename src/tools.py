@@ -201,7 +201,6 @@ def kfold_cross_validation(model, X, y, k=5):
     auc_scores = []
     
     for train_idx, val_idx in skf.split(X, y):
-        # Dividir dados
         X_train_fold, X_valid_fold = X[train_idx], X[val_idx]
         y_train_fold, y_valid_fold = y[train_idx], y[val_idx]
         
@@ -214,7 +213,7 @@ def kfold_cross_validation(model, X, y, k=5):
         accuracy_scores.append(accuracy_score(y_valid_fold, y_pred))
         auc_scores.append(roc_auc_score(y_valid_fold, y_prob))
     
-    print(f"Acurácia média: {np.mean(accuracy_scores):.4f} (+/- {np.std(accuracy_scores):.4f})")
+    print(f"Precisão média: {np.mean(accuracy_scores):.4f} (+/- {np.std(accuracy_scores):.4f})")
     print(f"AUC médio: {np.mean(auc_scores):.4f} (+/- {np.std(auc_scores):.4f})")
     
     return accuracy_scores, auc_scores
