@@ -62,7 +62,7 @@ def predition_stats(trueclass,prediction):
     true_neg = cm[1][1]
     false_pos = cm[1][0]
     
-    total_positives = true_pos+false_neg
+    total_positives = true_pos + false_neg
     total_negatives = true_neg + false_pos
     
     recall = np.round((true_pos / (total_positives))*100, 1)
@@ -77,7 +77,8 @@ def predition_stats(trueclass,prediction):
     
     F_score = np.round((2*pos_precision*recall)/(pos_precision + recall),4)
     G_score = np.round(np.sqrt(pos_precision*recall),4)
-    
+    print(cm)
+    print("\n")
     print(f"\nTrue Positives {true_pos} ({tp_rate}%)\
             \nFalse Negatives {false_neg} ({fn_rate}%)\
             \n\nTrue Negatives {true_neg} ({tn_rate}%)\
