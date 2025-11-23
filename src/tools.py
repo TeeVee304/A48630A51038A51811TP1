@@ -10,6 +10,22 @@ from sklearn.metrics import confusion_matrix, roc_curve, roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import accuracy_score, roc_auc_score
 
+def show_corr_matrix(input):
+    corrM = np.corrcoef(input)
+    string = "  |"
+    for i in range(len(corrM)):
+        if i == 0:
+            string += f"  {i}\t|"
+        else:
+            string += f"   {i}\t|"
+    print(string)
+
+    for l in range(len(corrM)):
+        string=f"|{l}|"
+        for c in range(len(corrM[l])):
+            string += str(np.round(np.abs(corrM[c][l]),2))+"\t| "
+        print(string)
+
 def get_best_params(param_grid, model, data, labels):
     """
     Obtém os melhores parâmetros para um dado modelo e conjunto de dados recorrendo ao GridSearchCV.
