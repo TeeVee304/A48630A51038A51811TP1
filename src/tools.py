@@ -6,7 +6,7 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix, roc_curve, roc_auc_score
-
+from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import accuracy_score, roc_auc_score
 
@@ -78,7 +78,6 @@ def predition_stats(trueclass,prediction):
     F_score = np.round((2*pos_precision*recall)/(pos_precision + recall),4)
     G_score = np.round(np.sqrt(pos_precision*recall),4)
     print(cm)
-    print("\n")
     print(f"\nTrue Positives {true_pos} ({tp_rate}%)\
             \nFalse Negatives {false_neg} ({fn_rate}%)\
             \n\nTrue Negatives {true_neg} ({tn_rate}%)\
@@ -224,7 +223,10 @@ def kfold_cross_validation(model, X, y, k=5):
         # Treinar e prever
         model.fit(X_train_fold, y_train_fold)
         y_pred = model.predict(X_valid_fold)
-        y_prob = model.predict_proba(X_valid_fold)[:, 1]
+        if isinstance(model, SVC):
+            y_prob = model.decision_function(X_valid_fold)
+        else :
+            y_prob = model.predict_proba(X_valid_fold)[:, 1]
         
         # Calcular métricas
         accuracy_scores.append(accuracy_score(y_valid_fold, y_pred))
@@ -232,5 +234,3 @@ def kfold_cross_validation(model, X, y, k=5):
     
     print(f"Precisão média: {np.mean(accuracy_scores):.4f} (+/- {np.std(accuracy_scores):.4f})")
     print(f"AUC médio: {np.mean(auc_scores):.4f} (+/- {np.std(auc_scores):.4f})")
-    
-    return accuracy_scores, auc_scores
